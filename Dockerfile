@@ -40,9 +40,20 @@ COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
+COPY --from=builder /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
+
+# Copy seed script and dependencies
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/node_modules/bcrypt ./node_modules/bcrypt
+COPY --from=builder /app/node_modules/tsx ./node_modules/tsx
 
 # Create data directory for SQLite
 RUN mkdir -p /app/data && chown -R nextjs:nodejs /app/data
+
+# Startup script: run migrations, seed if needed, then start
+COPY --from=builder /app/prisma/seed.ts ./prisma/seed.ts
+RUN printf '#!/bin/sh\n./node_modules/.bin/prisma migrate deploy\nnode server.js\n' > /app/start.sh && chmod +x /app/start.sh
 
 USER nextjs
 
@@ -51,4 +62,4 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["node", "server.js"]
+CMD ["sh", "/app/start.sh"]
