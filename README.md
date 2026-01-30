@@ -87,6 +87,60 @@ docker-compose exec app npm run db:seed
 
 The app will be available at [http://localhost:3000](http://localhost:3000)
 
+### OpenMediaVault 7 (Docker Compose Plugin)
+
+If you're running OMV7 with the [Docker Compose plugin](https://wiki.omv-extras.org/doku.php?id=omv7:omv7_plugins:docker_compose), you can deploy directly from the GitHub repo.
+
+Create a new compose file in the OMV GUI with:
+
+```yaml
+services:
+  app:
+    build:
+      context: https://github.com/zackbresler/maggies-book-club.git
+    ports:
+      - "3000:3000"
+    volumes:
+      - ${CHANGE_TO_COMPOSE_DATA_PATH}/bookclub:/app/data  # BACKUP
+    environment:
+      - DATABASE_URL=file:/app/data/bookclub.db
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
+    restart: unless-stopped
+```
+
+Set the following in the compose plugin's `.env` file:
+
+```env
+NEXTAUTH_SECRET=<generate with: openssl rand -base64 32>
+NEXTAUTH_URL=http://<your-server-ip-or-hostname>:3000
+```
+
+After the container starts, initialize the database:
+
+```bash
+docker exec -it <container-name> npx prisma migrate deploy
+docker exec -it <container-name> npm run db:seed
+```
+
+The `# BACKUP` comment on the volume tells OMV to include the SQLite database in its scheduled backups.
+
+### Reverse Proxy
+
+If running behind a reverse proxy (e.g., Nginx, Caddy, Traefik), set `NEXTAUTH_URL` to the public URL users will access in their browser:
+
+```env
+NEXTAUTH_URL=https://bookclub.yourdomain.com
+```
+
+NextAuth uses this for callback URLs, CSRF tokens, and redirects — if it doesn't match the public URL, authentication will break.
+
+Make sure your reverse proxy forwards these headers:
+
+- `Host`
+- `X-Forwarded-For`
+- `X-Forwarded-Proto`
+
 ## Usage
 
 ### First Time Setup
