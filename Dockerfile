@@ -41,7 +41,7 @@ COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
-COPY --from=builder /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
+COPY --from=builder /app/node_modules/@prisma/engines ./node_modules/@prisma/engines
 
 # Copy seed script and dependencies
 COPY --from=builder /app/package.json ./package.json
@@ -53,7 +53,7 @@ RUN mkdir -p /app/data && chown -R nextjs:nodejs /app/data
 
 # Startup script: run migrations, seed if needed, then start
 COPY --from=builder /app/prisma/seed.ts ./prisma/seed.ts
-RUN printf '#!/bin/sh\n./node_modules/.bin/prisma migrate deploy\nnode server.js\n' > /app/start.sh && chmod +x /app/start.sh
+RUN printf '#!/bin/sh\nnode node_modules/prisma/build/index.js migrate deploy\nnode server.js\n' > /app/start.sh && chmod +x /app/start.sh
 
 USER nextjs
 
