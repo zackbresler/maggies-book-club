@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -11,6 +11,14 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [subtitle, setSubtitle] = useState("It's brunch time!")
+
+  useEffect(() => {
+    fetch('/api/admin/settings?key=loginSubtitle')
+      .then(res => res.json())
+      .then(data => { if (data.value) setSubtitle(data.value) })
+      .catch(() => {})
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -41,11 +49,11 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-cream py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <h1 className="book-title text-4xl sm:text-5xl">
-            Maggie&apos;s Book Club
+          <h1 className="text-4xl sm:text-5xl font-bold text-burgundy-800" style={{ fontFamily: 'var(--font-cinzel-decorative), serif', letterSpacing: '0.05em' }}>
+            Maggie&apos;s<br />BookClub
           </h1>
           <p className="mt-4 text-burgundy-600 font-serif italic">
-            A fellowship of readers
+            {subtitle}
           </p>
           <h2 className="mt-8 text-xl font-display text-burgundy-700">
             Sign in to your account

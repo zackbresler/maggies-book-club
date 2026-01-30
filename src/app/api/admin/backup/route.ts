@@ -9,7 +9,7 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const [users, books, ratings, votes, inviteCodes, discussionQuestions, announcements] =
+  const [users, books, ratings, votes, inviteCodes, discussionQuestions, announcements, siteSettings] =
     await Promise.all([
       prisma.user.findMany(),
       prisma.book.findMany(),
@@ -18,6 +18,7 @@ export async function GET() {
       prisma.inviteCode.findMany(),
       prisma.discussionQuestion.findMany(),
       prisma.announcement.findMany(),
+      prisma.siteSetting.findMany(),
     ])
 
   const backup = {
@@ -31,6 +32,7 @@ export async function GET() {
       inviteCodes,
       discussionQuestions,
       announcements,
+      siteSettings,
     },
   }
 
@@ -54,7 +56,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid backup file' }, { status: 400 })
   }
 
-  const { users, books, ratings, votes, inviteCodes, discussionQuestions, announcements } = backup.data
+  const { users, books, ratings, votes, inviteCodes, discussionQuestions, announcements, siteSettings } = backup.data
 
   // Delete everything in dependency order, then re-insert
   await prisma.$transaction(async (tx) => {
@@ -65,6 +67,7 @@ export async function POST(request: Request) {
     await tx.announcement.deleteMany()
     await tx.book.deleteMany()
     await tx.user.deleteMany()
+    await tx.siteSetting.deleteMany()
 
     if (users?.length) {
       for (const u of users) {
@@ -99,6 +102,11 @@ export async function POST(request: Request) {
     if (announcements?.length) {
       for (const a of announcements) {
         await tx.announcement.create({ data: a })
+      }
+    }
+    if (siteSettings?.length) {
+      for (const s of siteSettings) {
+        await tx.siteSetting.create({ data: s })
       }
     }
   })

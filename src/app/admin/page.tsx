@@ -46,6 +46,9 @@ export default function AdminPage() {
   const [generating, setGenerating] = useState(false)
   const [backupMessage, setBackupMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   const [importing, setImporting] = useState(false)
+  const [loginSubtitle, setLoginSubtitle] = useState('')
+  const [savingSubtitle, setSavingSubtitle] = useState(false)
+  const [subtitleMessage, setSubtitleMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
   useEffect(() => {
     if (status === 'authenticated' && !session?.user?.isAdmin) {
@@ -56,6 +59,10 @@ export default function AdminPage() {
   useEffect(() => {
     if (session?.user?.isAdmin) {
       fetchData()
+      fetch('/api/admin/settings?key=loginSubtitle')
+        .then(res => res.json())
+        .then(data => { if (data.value) setLoginSubtitle(data.value) })
+        .catch(() => {})
     }
   }, [session])
 
@@ -234,6 +241,59 @@ export default function AdminPage() {
               </table>
             </div>
           )}
+        </div>
+
+        {/* Site Settings */}
+        <div className="bg-white shadow rounded-lg p-6">
+          <h2 className="text-lg font-medium text-gray-900 mb-4">Site Settings</h2>
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault()
+              setSavingSubtitle(true)
+              setSubtitleMessage(null)
+              try {
+                const res = await fetch('/api/admin/settings', {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ key: 'loginSubtitle', value: loginSubtitle }),
+                })
+                if (res.ok) {
+                  setSubtitleMessage({ type: 'success', text: 'Subtitle updated' })
+                } else {
+                  setSubtitleMessage({ type: 'error', text: 'Failed to save' })
+                }
+              } catch {
+                setSubtitleMessage({ type: 'error', text: 'Something went wrong' })
+              } finally {
+                setSavingSubtitle(false)
+              }
+            }}
+            className="space-y-3"
+          >
+            <div>
+              <label htmlFor="loginSubtitle" className="block text-sm font-medium text-gray-700">Login Page Subtitle</label>
+              <input
+                id="loginSubtitle"
+                type="text"
+                value={loginSubtitle}
+                onChange={(e) => setLoginSubtitle(e.target.value)}
+                placeholder="It's brunch time!"
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              />
+            </div>
+            {subtitleMessage && (
+              <p className={`text-sm ${subtitleMessage.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
+                {subtitleMessage.text}
+              </p>
+            )}
+            <button
+              type="submit"
+              disabled={savingSubtitle}
+              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 text-sm font-medium"
+            >
+              {savingSubtitle ? 'Saving...' : 'Save'}
+            </button>
+          </form>
         </div>
 
         {/* Data Backup & Restore */}

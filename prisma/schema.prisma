@@ -109,4 +109,9 @@ model Announcement {
   updatedAt DateTime @updatedAt
 }
 
+model SiteSetting {
+  key   String @id
+  value String
+}
+
 // BookStatus values: CURRENT, SUGGESTION, COMPLETED
