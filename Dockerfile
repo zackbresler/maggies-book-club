@@ -53,11 +53,9 @@ COPY --from=builder /app/node_modules/bcrypt ./node_modules/bcrypt
 # Create data directory for SQLite
 RUN mkdir -p /app/data && chown -R nextjs:nodejs /app/data
 
-# Startup script: run migrations, seed if needed, then start
+# Startup script: fix data dir permissions, run migrations, then start as nextjs
 COPY --from=builder /app/prisma/seed.js ./prisma/seed.js
-RUN printf '#!/bin/sh\nnode node_modules/prisma/build/index.js migrate deploy\nnode server.js\n' > /app/start.sh && chmod +x /app/start.sh
-
-USER nextjs
+RUN printf '#!/bin/sh\nchown -R nextjs:nodejs /app/data\nsu -s /bin/sh nextjs -c "node node_modules/prisma/build/index.js migrate deploy && node server.js"\n' > /app/start.sh && chmod +x /app/start.sh
 
 EXPOSE 3000
 
