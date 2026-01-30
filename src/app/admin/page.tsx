@@ -378,8 +378,7 @@ export default function AdminPage() {
                     onChange={(e) => updateBookStatus(book.id, e.target.value)}
                     className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
-                    <option value="UPCOMING">Upcoming</option>
-                    <option value="NEXT">Next</option>
+                    <option value="SUGGESTION">Suggestion</option>
                     <option value="CURRENT">Currently Reading</option>
                     <option value="COMPLETED">Completed</option>
                   </select>
