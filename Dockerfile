@@ -19,6 +19,9 @@ COPY . .
 # Generate Prisma client
 RUN npx prisma generate
 
+# Compile seed script to JS for production use
+RUN npx esbuild prisma/seed.ts --bundle --platform=node --outfile=prisma/seed.js --external:@prisma/client --external:bcrypt
+
 # Build application
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
@@ -46,13 +49,12 @@ COPY --from=builder /app/node_modules/@prisma/engines ./node_modules/@prisma/eng
 # Copy seed script and dependencies
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/node_modules/bcrypt ./node_modules/bcrypt
-COPY --from=builder /app/node_modules/tsx ./node_modules/tsx
 
 # Create data directory for SQLite
 RUN mkdir -p /app/data && chown -R nextjs:nodejs /app/data
 
 # Startup script: run migrations, seed if needed, then start
-COPY --from=builder /app/prisma/seed.ts ./prisma/seed.ts
+COPY --from=builder /app/prisma/seed.js ./prisma/seed.js
 RUN printf '#!/bin/sh\nnode node_modules/prisma/build/index.js migrate deploy\nnode server.js\n' > /app/start.sh && chmod +x /app/start.sh
 
 USER nextjs
