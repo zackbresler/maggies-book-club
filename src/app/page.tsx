@@ -81,6 +81,7 @@ export default function Dashboard() {
     notes: ''
   })
   const [savingAnnouncement, setSavingAnnouncement] = useState(false)
+  const [announcementError, setAnnouncementError] = useState<string | null>(null)
 
   const fetchDashboard = async () => {
     try {
@@ -141,6 +142,7 @@ export default function Dashboard() {
     e.preventDefault()
     if (savingAnnouncement) return
     setSavingAnnouncement(true)
+    setAnnouncementError(null)
 
     try {
       const response = await fetch('/api/announcement', {
@@ -151,8 +153,8 @@ export default function Dashboard() {
           timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
         })
       })
+      const data = await response.json()
       if (response.ok) {
-        const data = await response.json()
         setAnnouncement(data.announcement)
         setShowAnnouncementForm(false)
         setAnnouncementForm({
@@ -161,9 +163,12 @@ export default function Dashboard() {
           dateTime: '',
           notes: ''
         })
+      } else {
+        setAnnouncementError(data.error || 'Failed to save announcement')
       }
     } catch (error) {
       console.error('Failed to save announcement:', error)
+      setAnnouncementError('Network error — could not reach server')
     } finally {
       setSavingAnnouncement(false)
     }
@@ -372,6 +377,11 @@ export default function Dashboard() {
                   placeholder="e.g., Bring snacks!"
                 />
               </div>
+              {announcementError && (
+                <div className="px-3 py-2 bg-red-50 border border-red-200 rounded text-sm text-red-700">
+                  {announcementError}
+                </div>
+              )}
               <div className="flex gap-2">
                 <button
                   type="submit"
@@ -382,7 +392,7 @@ export default function Dashboard() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setShowAnnouncementForm(false)}
+                  onClick={() => { setShowAnnouncementForm(false); setAnnouncementError(null) }}
                   className="px-4 py-2 text-burgundy-600 hover:text-burgundy-800"
                 >
                   Cancel
