@@ -50,14 +50,16 @@ export async function POST(request: Request) {
       )
     }
 
-    // Sanitize inputs - normalize smart quotes and strip non-printable chars
+    // Sanitize inputs - keep only printable ASCII + common whitespace
     const sanitize = (s: string | null | undefined): string | null => {
       if (s == null || s === '') return null
+      // Replace smart quotes/dashes with ASCII equivalents, then strip anything non-ASCII
       return s
-        .replace(/[\u2018\u2019\u201A\u201B]/g, "'")
+        .replace(/[\u2018\u2019\u201A\u201B\u0060]/g, "'")
         .replace(/[\u201C\u201D\u201E\u201F]/g, '"')
-        .replace(/[\u2013\u2014]/g, '-')
-        .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
+        .replace(/[\u2013\u2014\u2015]/g, '-')
+        .replace(/\u2026/g, '...')
+        .replace(/[^\x20-\x7E\x0A\x0D\x09]/g, '')
     }
 
     const cleanTitle = sanitize(title) || 'Next Book Club Meeting'
