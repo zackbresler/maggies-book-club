@@ -71,8 +71,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ announcement })
   } catch (error) {
     console.error('Announcement POST error:', error)
+    const message = error instanceof Error ? error.message : String(error)
     return NextResponse.json(
-      { error: 'Failed to save announcement' },
+      { error: `Failed to save announcement: ${message}` },
       { status: 500 }
     )
   }
