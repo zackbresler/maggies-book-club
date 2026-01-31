@@ -50,6 +50,22 @@ export async function POST(request: Request) {
       )
     }
 
+    // Sanitize inputs - normalize smart quotes and strip non-printable chars
+    const sanitize = (s: string | null | undefined): string | null => {
+      if (s == null || s === '') return null
+      return s
+        .replace(/[\u2018\u2019\u201A\u201B]/g, "'")
+        .replace(/[\u201C\u201D\u201E\u201F]/g, '"')
+        .replace(/[\u2013\u2014]/g, '-')
+        .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
+    }
+
+    const cleanTitle = sanitize(title) || 'Next Book Club Meeting'
+    const cleanLocation = sanitize(location) || ''
+    const cleanDateTime = sanitize(dateTime) || ''
+    const cleanTimeZone = sanitize(timeZone) || 'America/Chicago'
+    const cleanNotes = sanitize(notes)
+
     // Deactivate all existing announcements
     await prisma.announcement.updateMany({
       where: { isActive: true },
@@ -59,11 +75,11 @@ export async function POST(request: Request) {
     // Create new announcement
     const announcement = await prisma.announcement.create({
       data: {
-        title: title || 'Next Book Club Meeting',
-        location,
-        dateTime,
-        timeZone: timeZone || 'America/Chicago',
-        notes: notes || null,
+        title: cleanTitle,
+        location: cleanLocation,
+        dateTime: cleanDateTime,
+        timeZone: cleanTimeZone,
+        notes: cleanNotes,
         isActive: true
       }
     })
