@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import crypto from 'crypto'
 
 // Get active announcement
 export async function GET() {
@@ -51,39 +50,20 @@ export async function POST(request: Request) {
       )
     }
 
-    // Sanitize inputs - keep only printable ASCII + common whitespace
-    const sanitize = (s: string | null | undefined): string | null => {
-      if (s == null || s === '') return null
-      // Replace smart quotes/dashes with ASCII equivalents, then strip anything non-ASCII
-      return s
-        .replace(/[\u2018\u2019\u201A\u201B\u0060]/g, "'")
-        .replace(/[\u201C\u201D\u201E\u201F]/g, '"')
-        .replace(/[\u2013\u2014\u2015]/g, '-')
-        .replace(/\u2026/g, '...')
-        .replace(/[^\x20-\x7E\x0A\x0D\x09]/g, '')
-    }
-
-    const cleanTitle = sanitize(title) || 'Next Book Club Meeting'
-    const cleanLocation = sanitize(location) || ''
-    const cleanDateTime = sanitize(dateTime) || ''
-    const cleanTimeZone = sanitize(timeZone) || 'America/Chicago'
-    const cleanNotes = sanitize(notes)
-
     // Deactivate all existing announcements
     await prisma.announcement.updateMany({
       where: { isActive: true },
       data: { isActive: false }
     })
 
-    // Create new announcement (provide ID explicitly to avoid cuid() issues on Alpine)
+    // Create new announcement
     const announcement = await prisma.announcement.create({
       data: {
-        id: crypto.randomUUID(),
-        title: cleanTitle,
-        location: cleanLocation,
-        dateTime: cleanDateTime,
-        timeZone: cleanTimeZone,
-        notes: cleanNotes,
+        title: title || 'Next Book Club Meeting',
+        location,
+        dateTime,
+        timeZone: timeZone || 'America/Chicago',
+        notes: notes || null,
         isActive: true
       }
     })
