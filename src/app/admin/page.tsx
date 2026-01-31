@@ -310,12 +310,37 @@ export default function AdminPage() {
                             </button>
                           </form>
                         ) : (
-                          <button
-                            onClick={() => setResetUserId(user.id)}
-                            className="text-indigo-600 hover:text-indigo-800 text-sm"
-                          >
-                            Reset Password
-                          </button>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => setResetUserId(user.id)}
+                              className="text-indigo-600 hover:text-indigo-800 text-sm"
+                            >
+                              Reset Password
+                            </button>
+                            {user.id !== session?.user?.id && (
+                              <button
+                                onClick={async () => {
+                                  if (!confirm(`Are you sure you want to delete ${user.name}? Their books will be reassigned to you. This cannot be undone.`)) return
+                                  setResetMessage(null)
+                                  try {
+                                    const res = await fetch(`/api/admin/users/${user.id}`, { method: 'DELETE' })
+                                    const data = await res.json()
+                                    if (res.ok) {
+                                      setResetMessage({ type: 'success', text: data.message })
+                                      fetchData()
+                                    } else {
+                                      setResetMessage({ type: 'error', text: data.error })
+                                    }
+                                  } catch {
+                                    setResetMessage({ type: 'error', text: 'Something went wrong' })
+                                  }
+                                }}
+                                className="text-red-600 hover:text-red-800 text-sm"
+                              >
+                                Delete
+                              </button>
+                            )}
+                          </div>
                         )}
                       </td>
                     </tr>
