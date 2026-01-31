@@ -5,36 +5,41 @@ import { prisma } from '@/lib/prisma'
 
 // Get active announcement
 export async function GET() {
-  const session = await getServerSession(authOptions)
+  try {
+    const session = await getServerSession(authOptions)
 
-  if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const announcement = await prisma.announcement.findFirst({
+      where: { isActive: true },
+      orderBy: { createdAt: 'desc' }
+    })
+
+    return NextResponse.json({ announcement })
+  } catch (error) {
+    console.error('Announcement GET error:', error)
+    return NextResponse.json({ announcement: null })
   }
-
-  const announcement = await prisma.announcement.findFirst({
-    where: { isActive: true },
-    orderBy: { createdAt: 'desc' }
-  })
-
-  return NextResponse.json({ announcement })
 }
 
 // Create or update announcement (admin only)
 export async function POST(request: Request) {
-  const session = await getServerSession(authOptions)
-
-  if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  if (!session.user.isAdmin) {
-    return NextResponse.json(
-      { error: 'Only admins can manage announcements' },
-      { status: 403 }
-    )
-  }
-
   try {
+    const session = await getServerSession(authOptions)
+
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    if (!session.user.isAdmin) {
+      return NextResponse.json(
+        { error: 'Only admins can manage announcements' },
+        { status: 403 }
+      )
+    }
+
     const body = await request.json()
     const { title, location, dateTime, timeZone, notes } = body
 
@@ -57,7 +62,7 @@ export async function POST(request: Request) {
         title: title || 'Next Book Club Meeting',
         location,
         dateTime,
-        timeZone: timeZone || Intl.DateTimeFormat().resolvedOptions().timeZone,
+        timeZone: timeZone || 'America/Chicago',
         notes: notes || null,
         isActive: true
       }
@@ -65,7 +70,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ announcement })
   } catch (error) {
-    console.error('Announcement error:', error)
+    console.error('Announcement POST error:', error)
     return NextResponse.json(
       { error: 'Failed to save announcement' },
       { status: 500 }
@@ -75,23 +80,31 @@ export async function POST(request: Request) {
 
 // Delete/deactivate announcement (admin only)
 export async function DELETE() {
-  const session = await getServerSession(authOptions)
+  try {
+    const session = await getServerSession(authOptions)
 
-  if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
 
-  if (!session.user.isAdmin) {
+    if (!session.user.isAdmin) {
+      return NextResponse.json(
+        { error: 'Only admins can manage announcements' },
+        { status: 403 }
+      )
+    }
+
+    await prisma.announcement.updateMany({
+      where: { isActive: true },
+      data: { isActive: false }
+    })
+
+    return NextResponse.json({ message: 'Announcement removed' })
+  } catch (error) {
+    console.error('Announcement DELETE error:', error)
     return NextResponse.json(
-      { error: 'Only admins can manage announcements' },
-      { status: 403 }
+      { error: 'Failed to remove announcement' },
+      { status: 500 }
     )
   }
-
-  await prisma.announcement.updateMany({
-    where: { isActive: true },
-    data: { isActive: false }
-  })
-
-  return NextResponse.json({ message: 'Announcement removed' })
 }
