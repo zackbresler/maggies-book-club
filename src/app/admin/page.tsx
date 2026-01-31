@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { ProtectedLayout } from '@/components/ProtectedLayout'
+import { ThemeSelector } from '@/components/ThemeSelector'
 
 interface InviteCode {
   id: string
@@ -47,8 +48,14 @@ export default function AdminPage() {
   const [backupMessage, setBackupMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   const [importing, setImporting] = useState(false)
   const [loginSubtitle, setLoginSubtitle] = useState('')
-  const [savingSubtitle, setSavingSubtitle] = useState(false)
-  const [subtitleMessage, setSubtitleMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const [siteName, setSiteName] = useState("Maggie's Book Club")
+  const [selectedTheme, setSelectedTheme] = useState('classic')
+  const [savingSettings, setSavingSettings] = useState(false)
+  const [settingsMessage, setSettingsMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const [resetUserId, setResetUserId] = useState<string | null>(null)
+  const [resetPassword, setResetPassword] = useState('')
+  const [resetMessage, setResetMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const [resetting, setResetting] = useState(false)
 
   useEffect(() => {
     if (status === 'authenticated' && !session?.user?.isAdmin) {
@@ -59,9 +66,15 @@ export default function AdminPage() {
   useEffect(() => {
     if (session?.user?.isAdmin) {
       fetchData()
-      fetch('/api/admin/settings?key=loginSubtitle')
+      fetch('/api/admin/settings')
         .then(res => res.json())
-        .then(data => { if (data.value) setLoginSubtitle(data.value) })
+        .then((data: Array<{ key: string; value: string }>) => {
+          const map: Record<string, string> = {}
+          data.forEach((s) => (map[s.key] = s.value))
+          if (map.loginSubtitle) setLoginSubtitle(map.loginSubtitle)
+          if (map.siteName) setSiteName(map.siteName)
+          if (map.theme) setSelectedTheme(map.theme)
+        })
         .catch(() => {})
     }
   }, [session])
@@ -205,6 +218,13 @@ export default function AdminPage() {
         {/* Members Section */}
         <div className="bg-white shadow rounded-lg p-6">
           <h2 className="text-lg font-medium text-gray-900 mb-4">Members</h2>
+          {resetMessage && (
+            <div className={`mb-4 px-4 py-3 rounded text-sm ${
+              resetMessage.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
+            }`}>
+              {resetMessage.text}
+            </div>
+          )}
           {users.length === 0 ? (
             <div className="text-gray-500">No members yet.</div>
           ) : (
@@ -216,6 +236,7 @@ export default function AdminPage() {
                     <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
                     <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
                     <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Joined</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -235,6 +256,68 @@ export default function AdminPage() {
                       <td className="px-4 py-3 text-sm text-gray-500">
                         {new Date(user.createdAt).toLocaleDateString()}
                       </td>
+                      <td className="px-4 py-3">
+                        {resetUserId === user.id ? (
+                          <form
+                            onSubmit={async (e) => {
+                              e.preventDefault()
+                              setResetting(true)
+                              setResetMessage(null)
+                              try {
+                                const res = await fetch(`/api/admin/users/${user.id}/reset-password`, {
+                                  method: 'PUT',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ password: resetPassword }),
+                                })
+                                const data = await res.json()
+                                if (res.ok) {
+                                  setResetMessage({ type: 'success', text: data.message })
+                                  setResetUserId(null)
+                                  setResetPassword('')
+                                } else {
+                                  setResetMessage({ type: 'error', text: data.error })
+                                }
+                              } catch {
+                                setResetMessage({ type: 'error', text: 'Something went wrong' })
+                              } finally {
+                                setResetting(false)
+                              }
+                            }}
+                            className="flex items-center gap-1"
+                          >
+                            <input
+                              type="text"
+                              value={resetPassword}
+                              onChange={(e) => setResetPassword(e.target.value)}
+                              placeholder="New password"
+                              minLength={8}
+                              required
+                              className="w-32 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                            />
+                            <button
+                              type="submit"
+                              disabled={resetting}
+                              className="px-2 py-1 bg-indigo-600 text-white rounded text-xs hover:bg-indigo-700 disabled:opacity-50"
+                            >
+                              Set
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => { setResetUserId(null); setResetPassword('') }}
+                              className="px-2 py-1 text-gray-500 hover:text-gray-700 text-xs"
+                            >
+                              Cancel
+                            </button>
+                          </form>
+                        ) : (
+                          <button
+                            onClick={() => setResetUserId(user.id)}
+                            className="text-indigo-600 hover:text-indigo-800 text-sm"
+                          >
+                            Reset Password
+                          </button>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -249,27 +332,49 @@ export default function AdminPage() {
           <form
             onSubmit={async (e) => {
               e.preventDefault()
-              setSavingSubtitle(true)
-              setSubtitleMessage(null)
+              setSavingSettings(true)
+              setSettingsMessage(null)
               try {
-                const res = await fetch('/api/admin/settings', {
-                  method: 'PUT',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ key: 'loginSubtitle', value: loginSubtitle }),
-                })
-                if (res.ok) {
-                  setSubtitleMessage({ type: 'success', text: 'Subtitle updated' })
+                const settings = [
+                  { key: 'siteName', value: siteName },
+                  { key: 'loginSubtitle', value: loginSubtitle },
+                  { key: 'theme', value: selectedTheme },
+                ]
+                const results = await Promise.all(
+                  settings.map((s) =>
+                    fetch('/api/admin/settings', {
+                      method: 'PUT',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify(s),
+                    })
+                  )
+                )
+                if (results.every((r) => r.ok)) {
+                  setSettingsMessage({ type: 'success', text: 'Settings saved. Reloading...' })
+                  setTimeout(() => window.location.reload(), 500)
                 } else {
-                  setSubtitleMessage({ type: 'error', text: 'Failed to save' })
+                  setSettingsMessage({ type: 'error', text: 'Failed to save some settings' })
                 }
               } catch {
-                setSubtitleMessage({ type: 'error', text: 'Something went wrong' })
+                setSettingsMessage({ type: 'error', text: 'Something went wrong' })
               } finally {
-                setSavingSubtitle(false)
+                setSavingSettings(false)
               }
             }}
-            className="space-y-3"
+            className="space-y-6"
           >
+            <div>
+              <label htmlFor="siteName" className="block text-sm font-medium text-gray-700">Site Name</label>
+              <input
+                id="siteName"
+                type="text"
+                value={siteName}
+                onChange={(e) => setSiteName(e.target.value)}
+                placeholder="Maggie's Book Club"
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              />
+              <p className="mt-1 text-xs text-gray-500">Displayed in the navbar, login page, and browser tab.</p>
+            </div>
             <div>
               <label htmlFor="loginSubtitle" className="block text-sm font-medium text-gray-700">Login Page Subtitle</label>
               <input
@@ -281,17 +386,21 @@ export default function AdminPage() {
                 className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
               />
             </div>
-            {subtitleMessage && (
-              <p className={`text-sm ${subtitleMessage.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
-                {subtitleMessage.text}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Theme</label>
+              <ThemeSelector value={selectedTheme} onChange={setSelectedTheme} />
+            </div>
+            {settingsMessage && (
+              <p className={`text-sm ${settingsMessage.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
+                {settingsMessage.text}
               </p>
             )}
             <button
               type="submit"
-              disabled={savingSubtitle}
+              disabled={savingSettings}
               className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 text-sm font-medium"
             >
-              {savingSubtitle ? 'Saving...' : 'Save'}
+              {savingSettings ? 'Saving...' : 'Save Settings'}
             </button>
           </form>
         </div>

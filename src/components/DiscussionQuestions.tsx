@@ -2,16 +2,53 @@
 
 import { useState } from 'react'
 
+function SpoilerSpan({ text }: { text: string }) {
+  const [revealed, setRevealed] = useState(false)
+
+  return (
+    <span
+      onClick={() => setRevealed(!revealed)}
+      className={`cursor-pointer rounded px-1 transition-colors ${
+        revealed
+          ? 'bg-gray-100 text-gray-700'
+          : 'bg-gray-800 text-gray-800 hover:bg-gray-700 select-none'
+      }`}
+      title={revealed ? 'Click to hide spoiler' : 'Click to reveal spoiler'}
+    >
+      {revealed ? text : 'SPOILER'}
+    </span>
+  )
+}
+
+function QuestionText({ text }: { text: string }) {
+  // Split on [...] brackets, rendering bracket contents as spoilers
+  const parts = text.split(/(\[[^\]]*\])/)
+  return (
+    <>
+      {parts.map((part, i) => {
+        if (part.startsWith('[') && part.endsWith(']')) {
+          const inner = part.slice(1, -1)
+          return <SpoilerSpan key={i} text={inner} />
+        }
+        return <span key={i}>{part}</span>
+      })}
+    </>
+  )
+}
+
 interface Question {
   id: string
   question: string
   sortOrder: number
+  userId?: string | null
+  user?: { id: string; name: string } | null
 }
 
 interface DiscussionQuestionsProps {
   bookId: string
   questions: Question[]
   isAdmin: boolean
+  currentUserId?: string
   onUpdate: () => void
 }
 
@@ -19,6 +56,7 @@ export function DiscussionQuestions({
   bookId,
   questions,
   isAdmin,
+  currentUserId,
   onUpdate
 }: DiscussionQuestionsProps) {
   const [newQuestion, setNewQuestion] = useState('')
@@ -90,6 +128,10 @@ export function DiscussionQuestions({
     setEditText(question.question)
   }
 
+  const canModify = (q: Question) => {
+    return isAdmin || (currentUserId && q.userId === currentUserId)
+  }
+
   return (
     <div className="bg-white shadow rounded-lg p-6">
       <h2 className="text-lg font-medium text-gray-900 mb-4">Discussion Questions</h2>
@@ -127,8 +169,14 @@ export function DiscussionQuestions({
                 </div>
               ) : (
                 <div className="flex-1 flex items-start justify-between gap-2">
-                  <p className="text-gray-700">{q.question}</p>
-                  {isAdmin && (
+                  <p className="text-gray-700">
+                    {q.user ? (
+                      <><span className="font-medium">{q.user.name}:</span> <QuestionText text={q.question} /></>
+                    ) : (
+                      <QuestionText text={q.question} />
+                    )}
+                  </p>
+                  {canModify(q) && (
                     <div className="flex-shrink-0 flex gap-1">
                       <button
                         onClick={() => startEditing(q)}
@@ -151,24 +199,27 @@ export function DiscussionQuestions({
         </ol>
       )}
 
-      {isAdmin && (
-        <form onSubmit={handleAddQuestion} className="flex gap-2 mt-4 pt-4 border-t border-gray-200">
-          <input
-            type="text"
-            value={newQuestion}
-            onChange={(e) => setNewQuestion(e.target.value)}
-            placeholder="Add a discussion question..."
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-          <button
-            type="submit"
-            disabled={loading || !newQuestion.trim()}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Add
-          </button>
-        </form>
-      )}
+      <div className="mt-4 pt-4 border-t border-gray-200">
+        <p className="text-xs text-gray-400 mb-2">
+          Tip: Wrap text in [square brackets] to hide it as a spoiler.
+        </p>
+      </div>
+      <form onSubmit={handleAddQuestion} className="flex gap-2">
+        <input
+          type="text"
+          value={newQuestion}
+          onChange={(e) => setNewQuestion(e.target.value)}
+          placeholder="Add a discussion question..."
+          className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        />
+        <button
+          type="submit"
+          disabled={loading || !newQuestion.trim()}
+          className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Add
+        </button>
+      </form>
     </div>
   )
 }

@@ -15,7 +15,10 @@ export async function GET(
 
   const questions = await prisma.discussionQuestion.findMany({
     where: { bookId: params.id },
-    orderBy: { sortOrder: 'asc' }
+    orderBy: { sortOrder: 'asc' },
+    include: {
+      user: { select: { id: true, name: true } }
+    }
   })
 
   return NextResponse.json(questions)
@@ -29,14 +32,6 @@ export async function POST(
 
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  // Only admins can add questions
-  if (!session.user.isAdmin) {
-    return NextResponse.json(
-      { error: 'Only admins can add discussion questions' },
-      { status: 403 }
-    )
   }
 
   try {
@@ -70,8 +65,12 @@ export async function POST(
     const newQuestion = await prisma.discussionQuestion.create({
       data: {
         bookId: params.id,
+        userId: session.user.id,
         question: question.trim(),
         sortOrder: newSortOrder
+      },
+      include: {
+        user: { select: { id: true, name: true } }
       }
     })
 

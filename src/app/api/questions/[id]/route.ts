@@ -13,9 +13,18 @@ export async function PATCH(
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  if (!session.user.isAdmin) {
+  // Check ownership or admin
+  const existing = await prisma.discussionQuestion.findUnique({
+    where: { id: params.id }
+  })
+
+  if (!existing) {
+    return NextResponse.json({ error: 'Question not found' }, { status: 404 })
+  }
+
+  if (!session.user.isAdmin && existing.userId !== session.user.id) {
     return NextResponse.json(
-      { error: 'Only admins can edit discussion questions' },
+      { error: 'You can only edit your own questions' },
       { status: 403 }
     )
   }
@@ -47,7 +56,7 @@ export async function PATCH(
 
     return NextResponse.json(updatedQuestion)
   } catch {
-    return NextResponse.json({ error: 'Question not found' }, { status: 404 })
+    return NextResponse.json({ error: 'Failed to update question' }, { status: 500 })
   }
 }
 
@@ -61,9 +70,18 @@ export async function DELETE(
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  if (!session.user.isAdmin) {
+  // Check ownership or admin
+  const existing = await prisma.discussionQuestion.findUnique({
+    where: { id: params.id }
+  })
+
+  if (!existing) {
+    return NextResponse.json({ error: 'Question not found' }, { status: 404 })
+  }
+
+  if (!session.user.isAdmin && existing.userId !== session.user.id) {
     return NextResponse.json(
-      { error: 'Only admins can delete discussion questions' },
+      { error: 'You can only delete your own questions' },
       { status: 403 }
     )
   }
@@ -75,6 +93,6 @@ export async function DELETE(
 
     return NextResponse.json({ message: 'Question deleted' })
   } catch {
-    return NextResponse.json({ error: 'Question not found' }, { status: 404 })
+    return NextResponse.json({ error: 'Failed to delete question' }, { status: 500 })
   }
 }

@@ -6,12 +6,14 @@ import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { RatingStars } from '@/components/RatingStars'
+import { useSiteSettings } from '@/contexts/SiteSettingsContext'
 
 interface Announcement {
   id: string
   title: string
   location: string
   dateTime: string
+  timeZone: string
   notes: string | null
 }
 
@@ -65,6 +67,7 @@ interface DashboardData {
 
 export default function Dashboard() {
   const { data: session } = useSession()
+  const { siteName } = useSiteSettings()
   const [data, setData] = useState<DashboardData | null>(null)
   const [announcement, setAnnouncement] = useState<Announcement | null>(null)
   const [loading, setLoading] = useState(true)
@@ -143,7 +146,10 @@ export default function Dashboard() {
       const response = await fetch('/api/announcement', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(announcementForm)
+        body: JSON.stringify({
+          ...announcementForm,
+          timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+        })
       })
       if (response.ok) {
         const data = await response.json()
@@ -172,10 +178,57 @@ export default function Dashboard() {
     }
   }
 
+  const formatAnnouncementDate = (dt: string, tz: string): string => {
+    // Parse "YYYY-MM-DDTHH:mm" in the stored timezone, display in viewer's local timezone
+    const [datePart, timePart] = dt.split('T')
+    const [year, month, day] = datePart.split('-').map(Number)
+    const [hour, minute] = (timePart || '00:00').split(':').map(Number)
+    // Use Intl to find the UTC offset for the source timezone at that date/time
+    // We create a date assuming UTC, then adjust
+    const utcDate = new Date(Date.UTC(year, month - 1, day, hour, minute))
+    // Format in the source timezone to find the offset
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: tz,
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', hour12: false
+    })
+    // Get what UTC looks like in the source tz to compute offset
+    const parts = formatter.formatToParts(utcDate)
+    const getPart = (type: string) => parseInt(parts.find(p => p.type === type)?.value || '0')
+    const tzYear = getPart('year'), tzMonth = getPart('month'), tzDay = getPart('day')
+    const tzHour = getPart('hour'), tzMinute = getPart('minute')
+    const tzAsUtc = Date.UTC(tzYear, tzMonth - 1, tzDay, tzHour === 24 ? 0 : tzHour, tzMinute)
+    const offsetMs = tzAsUtc - utcDate.getTime()
+    // The actual UTC time for the event is: desired local time minus the offset
+    const actualUtc = Date.UTC(year, month - 1, day, hour, minute) - offsetMs
+    return new Date(actualUtc).toLocaleDateString('en-US', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+      hour: 'numeric', minute: '2-digit'
+    })
+  }
+
+  const getAnnouncementUtcDate = (dt: string, tz: string): Date => {
+    const [datePart, timePart] = dt.split('T')
+    const [year, month, day] = datePart.split('-').map(Number)
+    const [hour, minute] = (timePart || '00:00').split(':').map(Number)
+    const utcDate = new Date(Date.UTC(year, month - 1, day, hour, minute))
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: tz,
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', hour12: false
+    })
+    const parts = formatter.formatToParts(utcDate)
+    const getPart = (type: string) => parseInt(parts.find(p => p.type === type)?.value || '0')
+    const tzHour = getPart('hour') === 24 ? 0 : getPart('hour')
+    const tzAsUtc = Date.UTC(getPart('year'), getPart('month') - 1, getPart('day'), tzHour, getPart('minute'))
+    const offsetMs = tzAsUtc - utcDate.getTime()
+    return new Date(Date.UTC(year, month - 1, day, hour, minute) - offsetMs)
+  }
+
   const generateICalLink = () => {
     if (!announcement) return ''
 
-    const startDate = new Date(announcement.dateTime)
+    const startDate = getAnnouncementUtcDate(announcement.dateTime, announcement.timeZone)
     const endDate = new Date(startDate.getTime() + 2 * 60 * 60 * 1000) // 2 hours duration
 
     const formatDate = (date: Date) => {
@@ -185,14 +238,14 @@ export default function Dashboard() {
     const icalContent = [
       'BEGIN:VCALENDAR',
       'VERSION:2.0',
-      'PRODID:-//Maggie\'s Book Club//EN',
+      `PRODID:-//${siteName}//EN`,
       'BEGIN:VEVENT',
       `DTSTART:${formatDate(startDate)}`,
       `DTEND:${formatDate(endDate)}`,
       `SUMMARY:${announcement.title}`,
       `LOCATION:${announcement.location}`,
       announcement.notes ? `DESCRIPTION:${announcement.notes.replace(/\n/g, '\\n')}` : '',
-      `UID:${announcement.id}@maggiesbookclub`,
+      `UID:${announcement.id}@${siteName.replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}`,
       'END:VEVENT',
       'END:VCALENDAR'
     ].filter(Boolean).join('\r\n')
@@ -224,14 +277,7 @@ export default function Dashboard() {
                 <div className="mt-2 space-y-1 text-sm text-burgundy-700">
                   <p>
                     <span className="font-medium">When:</span>{' '}
-                    {new Date(announcement.dateTime).toLocaleDateString('en-US', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                      hour: 'numeric',
-                      minute: '2-digit'
-                    })}
+                    {formatAnnouncementDate(announcement.dateTime, announcement.timeZone)}
                   </p>
                   <p>
                     <span className="font-medium">Where:</span> {announcement.location}

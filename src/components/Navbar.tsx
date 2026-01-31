@@ -3,10 +3,12 @@
 import Link from 'next/link'
 import { useSession, signOut } from 'next-auth/react'
 import { useState } from 'react'
+import { useSiteSettings } from '@/contexts/SiteSettingsContext'
 
 export function Navbar() {
   const { data: session } = useSession()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { siteName } = useSiteSettings()
 
   return (
     <nav className="leather-header">
@@ -15,7 +17,7 @@ export function Navbar() {
           <div className="flex">
             <Link href="/" className="flex items-center">
               <span className="book-title text-2xl sm:text-3xl">
-                Maggie&apos;s Book Club
+                {siteName}
               </span>
             </Link>
             {session && (

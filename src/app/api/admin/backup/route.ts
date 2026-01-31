@@ -9,7 +9,7 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const [users, books, ratings, votes, inviteCodes, discussionQuestions, announcements, siteSettings] =
+  const [users, books, ratings, votes, inviteCodes, discussionQuestions, announcements, siteSettings, bookNotes] =
     await Promise.all([
       prisma.user.findMany(),
       prisma.book.findMany(),
@@ -19,6 +19,7 @@ export async function GET() {
       prisma.discussionQuestion.findMany(),
       prisma.announcement.findMany(),
       prisma.siteSetting.findMany(),
+      prisma.bookNote.findMany(),
     ])
 
   const backup = {
@@ -33,6 +34,7 @@ export async function GET() {
       discussionQuestions,
       announcements,
       siteSettings,
+      bookNotes,
     },
   }
 
@@ -56,13 +58,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid backup file' }, { status: 400 })
   }
 
-  const { users, books, ratings, votes, inviteCodes, discussionQuestions, announcements, siteSettings } = backup.data
+  const { users, books, ratings, votes, inviteCodes, discussionQuestions, announcements, siteSettings, bookNotes } = backup.data
 
   // Delete everything in dependency order, then re-insert
   await prisma.$transaction(async (tx) => {
     await tx.vote.deleteMany()
     await tx.rating.deleteMany()
     await tx.discussionQuestion.deleteMany()
+    await tx.bookNote.deleteMany()
     await tx.inviteCode.deleteMany()
     await tx.announcement.deleteMany()
     await tx.book.deleteMany()
@@ -107,6 +110,11 @@ export async function POST(request: Request) {
     if (siteSettings?.length) {
       for (const s of siteSettings) {
         await tx.siteSetting.create({ data: s })
+      }
+    }
+    if (bookNotes?.length) {
+      for (const bn of bookNotes) {
+        await tx.bookNote.create({ data: bn })
       }
     }
   })

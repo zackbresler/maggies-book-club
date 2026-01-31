@@ -9,6 +9,7 @@ import { ProtectedLayout } from '@/components/ProtectedLayout'
 import { RatingStars } from '@/components/RatingStars'
 import { ExternalLinks } from '@/components/ExternalLinks'
 import { DiscussionQuestions } from '@/components/DiscussionQuestions'
+import { BookNotes } from '@/components/BookNotes'
 
 interface Rating {
   id: string
@@ -24,6 +25,8 @@ interface Question {
   id: string
   question: string
   sortOrder: number
+  userId?: string | null
+  user?: { id: string; name: string } | null
 }
 
 interface Book {
@@ -333,11 +336,15 @@ export default function BookDetailPage() {
           <ExternalLinks isbn={book.isbn13 || book.isbn || ''} title={book.title} />
         )}
 
+        {/* My Notes */}
+        <BookNotes bookId={book.id} />
+
         {/* Discussion Questions */}
         <DiscussionQuestions
           bookId={book.id}
           questions={book.questions}
           isAdmin={isAdmin || false}
+          currentUserId={session?.user?.id}
           onUpdate={fetchBook}
         />
       </div>

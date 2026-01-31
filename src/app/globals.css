@@ -2,14 +2,767 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Default fallback (classic) — overridden by [data-theme] blocks below */
 :root {
   --background: #FDF8F3;
   --foreground: #2D2D2D;
+  --color-cream: #FDF8F3;
+  --color-cream-50: #FFFDFB;
+  --color-cream-100: #FDF8F3;
+  --color-cream-200: #F9F0E6;
+  --color-cream-300: #F2E4D3;
+  --color-cream-400: #E8D4BC;
+  --color-burgundy: #722F37;
+  --color-burgundy-50: #F9E8EA;
+  --color-burgundy-100: #F0CDD0;
+  --color-burgundy-200: #D89EA4;
+  --color-burgundy-300: #C06F78;
+  --color-burgundy-400: #8B3D46;
+  --color-burgundy-500: #722F37;
+  --color-burgundy-600: #5C262C;
+  --color-burgundy-700: #461D22;
+  --color-burgundy-800: #301417;
+  --color-burgundy-900: #1A0B0D;
+  --color-gold: #C9A227;
+  --color-gold-50: #FCF7E6;
+  --color-gold-100: #F7ECBF;
+  --color-gold-200: #EDD87F;
+  --color-gold-300: #DFC044;
+  --color-gold-400: #C9A227;
+  --color-gold-500: #A88520;
+  --color-gold-600: #876A1A;
+  --color-gold-700: #665013;
+  --color-gold-800: #44360D;
+  --color-gold-900: #221B06;
+  --color-forest: #2D4739;
+  --color-forest-50: #E8EFEB;
+  --color-forest-100: #C8D9CF;
+  --color-forest-200: #96B3A3;
+  --color-forest-300: #648D77;
+  --color-forest-400: #3D6651;
+  --color-forest-500: #2D4739;
+  --color-forest-600: #243A2E;
+  --color-forest-700: #1B2C23;
+  --color-forest-800: #121D17;
+  --color-forest-900: #090F0C;
+  --color-parchment: #F4E4C9;
+  --color-parchment-light: #FAF3E7;
+  --color-parchment-dark: #E6D5B8;
+  --font-display: var(--font-cinzel-decorative), serif;
+  --font-display-style: normal;
+  --font-body: var(--font-lora), Georgia, Cambria, serif;
+  --gradient-gold-1: #C9A227;
+  --gradient-gold-2: #F7ECBF;
+  --gradient-gold-3: #C9A227;
+  --gradient-gold-4: #876A1A;
+  --gradient-gold-5: #C9A227;
+  --leather-top: #5C262C;
+  --leather-mid: #722F37;
+  --leather-bottom: #461D22;
+  --leather-border: #C9A227;
+  --parchment-1: #FAF3E7;
+  --parchment-2: #F4E4C9;
+  --parchment-3: #E6D5B8;
+  --btn-gold-top: #DFC044;
+  --btn-gold-mid: #C9A227;
+  --btn-gold-bottom: #A88520;
+  --btn-gold-text: #2D2D2D;
+  --btn-gold-border: #876A1A;
+  --btn-gold-hover-top: #EDD87F;
+  --btn-gold-hover-mid: #DFC044;
+  --btn-gold-hover-bottom: #C9A227;
+  --btn-burgundy-top: #8B3D46;
+  --btn-burgundy-mid: #722F37;
+  --btn-burgundy-bottom: #5C262C;
+  --btn-burgundy-text: #FDF8F3;
+  --btn-burgundy-border: #461D22;
+  --btn-burgundy-hover-top: #C06F78;
+  --btn-burgundy-hover-mid: #8B3D46;
+  --btn-burgundy-hover-bottom: #722F37;
+  --book-title-solid-color: #C9A227;
+  --book-title-solid-shadow: #876A1A;
+  --book-divider-color: #C9A227;
+}
+
+/* ==============================
+   THEME: Classic (warm bookshop)
+   ============================== */
+[data-theme="classic"] {
+  --background: #FDF8F3;
+  --foreground: #2D2D2D;
+
+  --color-cream: #FDF8F3;
+  --color-cream-50: #FFFDFB;
+  --color-cream-100: #FDF8F3;
+  --color-cream-200: #F9F0E6;
+  --color-cream-300: #F2E4D3;
+  --color-cream-400: #E8D4BC;
+
+  --color-burgundy: #722F37;
+  --color-burgundy-50: #F9E8EA;
+  --color-burgundy-100: #F0CDD0;
+  --color-burgundy-200: #D89EA4;
+  --color-burgundy-300: #C06F78;
+  --color-burgundy-400: #8B3D46;
+  --color-burgundy-500: #722F37;
+  --color-burgundy-600: #5C262C;
+  --color-burgundy-700: #461D22;
+  --color-burgundy-800: #301417;
+  --color-burgundy-900: #1A0B0D;
+
+  --color-gold: #C9A227;
+  --color-gold-50: #FCF7E6;
+  --color-gold-100: #F7ECBF;
+  --color-gold-200: #EDD87F;
+  --color-gold-300: #DFC044;
+  --color-gold-400: #C9A227;
+  --color-gold-500: #A88520;
+  --color-gold-600: #876A1A;
+  --color-gold-700: #665013;
+  --color-gold-800: #44360D;
+  --color-gold-900: #221B06;
+
+  --color-forest: #2D4739;
+  --color-forest-50: #E8EFEB;
+  --color-forest-100: #C8D9CF;
+  --color-forest-200: #96B3A3;
+  --color-forest-300: #648D77;
+  --color-forest-400: #3D6651;
+  --color-forest-500: #2D4739;
+  --color-forest-600: #243A2E;
+  --color-forest-700: #1B2C23;
+  --color-forest-800: #121D17;
+  --color-forest-900: #090F0C;
+
+  --color-parchment: #F4E4C9;
+  --color-parchment-light: #FAF3E7;
+  --color-parchment-dark: #E6D5B8;
+
+  --font-display: var(--font-cinzel-decorative), serif;
+  --font-body: var(--font-lora), Georgia, Cambria, serif;
+
+  --gradient-gold-1: #C9A227;
+  --gradient-gold-2: #F7ECBF;
+  --gradient-gold-3: #C9A227;
+  --gradient-gold-4: #876A1A;
+  --gradient-gold-5: #C9A227;
+
+  --leather-top: #5C262C;
+  --leather-mid: #722F37;
+  --leather-bottom: #461D22;
+  --leather-border: #C9A227;
+
+  --parchment-1: #FAF3E7;
+  --parchment-2: #F4E4C9;
+  --parchment-3: #E6D5B8;
+
+  --btn-gold-top: #DFC044;
+  --btn-gold-mid: #C9A227;
+  --btn-gold-bottom: #A88520;
+  --btn-gold-text: #2D2D2D;
+  --btn-gold-border: #876A1A;
+  --btn-gold-hover-top: #EDD87F;
+  --btn-gold-hover-mid: #DFC044;
+  --btn-gold-hover-bottom: #C9A227;
+
+  --btn-burgundy-top: #8B3D46;
+  --btn-burgundy-mid: #722F37;
+  --btn-burgundy-bottom: #5C262C;
+  --btn-burgundy-text: #FDF8F3;
+  --btn-burgundy-border: #461D22;
+  --btn-burgundy-hover-top: #C06F78;
+  --btn-burgundy-hover-mid: #8B3D46;
+  --btn-burgundy-hover-bottom: #722F37;
+
+  --book-title-solid-color: #C9A227;
+  --book-title-solid-shadow: #876A1A;
+  --book-divider-color: #C9A227;
+}
+
+/* ==============================
+   THEME: Dark Classic
+   ============================== */
+[data-theme="dark-classic"] {
+  --background: #1A1410;
+  --foreground: #E8DDD0;
+
+  --color-cream: #1A1410;
+  --color-cream-50: #231C16;
+  --color-cream-100: #2C241C;
+  --color-cream-200: #3D3228;
+  --color-cream-300: #4E4234;
+  --color-cream-400: #5F5240;
+
+  --color-burgundy: #C06F78;
+  --color-burgundy-50: #1E1214;
+  --color-burgundy-100: #2E1B1E;
+  --color-burgundy-200: #4A2D32;
+  --color-burgundy-300: #6B3F46;
+  --color-burgundy-400: #8B3D46;
+  --color-burgundy-500: #C06F78;
+  --color-burgundy-600: #D89EA4;
+  --color-burgundy-700: #E8BCC0;
+  --color-burgundy-800: #F0CDD0;
+  --color-burgundy-900: #F9E8EA;
+
+  --color-gold: #EDD87F;
+  --color-gold-50: #1C1A0E;
+  --color-gold-100: #2E2A14;
+  --color-gold-200: #4A4420;
+  --color-gold-300: #7A6E2A;
+  --color-gold-400: #C9A227;
+  --color-gold-500: #DFC044;
+  --color-gold-600: #EDD87F;
+  --color-gold-700: #F7ECBF;
+  --color-gold-800: #FCF7E6;
+  --color-gold-900: #FFFDF5;
+
+  --color-forest: #96B3A3;
+  --color-forest-50: #0E1410;
+  --color-forest-100: #162018;
+  --color-forest-200: #243A2E;
+  --color-forest-300: #3D6651;
+  --color-forest-400: #648D77;
+  --color-forest-500: #96B3A3;
+  --color-forest-600: #B0CBBD;
+  --color-forest-700: #C8D9CF;
+  --color-forest-800: #E0ECE4;
+  --color-forest-900: #E8EFEB;
+
+  --color-parchment: #2C241C;
+  --color-parchment-light: #3D3228;
+  --color-parchment-dark: #1A1410;
+
+  --font-display: var(--font-cinzel-decorative), serif;
+  --font-body: var(--font-lora), Georgia, Cambria, serif;
+
+  --gradient-gold-1: #EDD87F;
+  --gradient-gold-2: #FCF7E6;
+  --gradient-gold-3: #EDD87F;
+  --gradient-gold-4: #C9A227;
+  --gradient-gold-5: #EDD87F;
+
+  --leather-top: #2E1B1E;
+  --leather-mid: #3A2226;
+  --leather-bottom: #1E1214;
+  --leather-border: #EDD87F;
+
+  --parchment-1: #2C241C;
+  --parchment-2: #231C16;
+  --parchment-3: #1A1410;
+
+  --btn-gold-top: #EDD87F;
+  --btn-gold-mid: #DFC044;
+  --btn-gold-bottom: #C9A227;
+  --btn-gold-text: #1A1410;
+  --btn-gold-border: #C9A227;
+  --btn-gold-hover-top: #F7ECBF;
+  --btn-gold-hover-mid: #EDD87F;
+  --btn-gold-hover-bottom: #DFC044;
+
+  --btn-burgundy-top: #8B3D46;
+  --btn-burgundy-mid: #6B3F46;
+  --btn-burgundy-bottom: #4A2D32;
+  --btn-burgundy-text: #F9E8EA;
+  --btn-burgundy-border: #2E1B1E;
+  --btn-burgundy-hover-top: #C06F78;
+  --btn-burgundy-hover-mid: #8B3D46;
+  --btn-burgundy-hover-bottom: #6B3F46;
+
+  --book-title-solid-color: #EDD87F;
+  --book-title-solid-shadow: #C9A227;
+  --book-divider-color: #EDD87F;
+}
+
+/* ==============================
+   THEME: Dark Sci-Fi
+   ============================== */
+[data-theme="dark-scifi"] {
+  --background: #0A0E12;
+  --foreground: #C8D6E0;
+
+  --color-cream: #0A0E12;
+  --color-cream-50: #111820;
+  --color-cream-100: #18222E;
+  --color-cream-200: #1F2D3D;
+  --color-cream-300: #2A3A4E;
+  --color-cream-400: #354860;
+
+  --color-burgundy: #4A90E2;
+  --color-burgundy-50: #0C1520;
+  --color-burgundy-100: #122040;
+  --color-burgundy-200: #1E3A6B;
+  --color-burgundy-300: #2D5A9E;
+  --color-burgundy-400: #3A78C8;
+  --color-burgundy-500: #4A90E2;
+  --color-burgundy-600: #6BA8F0;
+  --color-burgundy-700: #8DC0F8;
+  --color-burgundy-800: #B0D4FB;
+  --color-burgundy-900: #D4E8FD;
+
+  --color-gold: #F5A623;
+  --color-gold-50: #1C1508;
+  --color-gold-100: #3A2A10;
+  --color-gold-200: #6B4D1A;
+  --color-gold-300: #A07520;
+  --color-gold-400: #D49525;
+  --color-gold-500: #F5A623;
+  --color-gold-600: #F8BC52;
+  --color-gold-700: #FACE80;
+  --color-gold-800: #FCDEAD;
+  --color-gold-900: #FEF0D9;
+
+  --color-forest: #34D399;
+  --color-forest-50: #0A1A14;
+  --color-forest-100: #122E22;
+  --color-forest-200: #1E5A40;
+  --color-forest-300: #28835D;
+  --color-forest-400: #30AB7B;
+  --color-forest-500: #34D399;
+  --color-forest-600: #5EDDB0;
+  --color-forest-700: #88E8C6;
+  --color-forest-800: #B2F2DD;
+  --color-forest-900: #DCFAF0;
+
+  --color-parchment: #18222E;
+  --color-parchment-light: #1F2D3D;
+  --color-parchment-dark: #111820;
+
+  --font-display: var(--font-orbitron), system-ui, sans-serif;
+  --font-body: system-ui, -apple-system, sans-serif;
+
+  --gradient-gold-1: #F5A623;
+  --gradient-gold-2: #FACE80;
+  --gradient-gold-3: #F5A623;
+  --gradient-gold-4: #A07520;
+  --gradient-gold-5: #F5A623;
+
+  --leather-top: #111820;
+  --leather-mid: #0A0E12;
+  --leather-bottom: #060A0E;
+  --leather-border: #4A90E2;
+
+  --parchment-1: #18222E;
+  --parchment-2: #111820;
+  --parchment-3: #0A0E12;
+
+  --btn-gold-top: #F8BC52;
+  --btn-gold-mid: #F5A623;
+  --btn-gold-bottom: #D49525;
+  --btn-gold-text: #0A0E12;
+  --btn-gold-border: #A07520;
+  --btn-gold-hover-top: #FACE80;
+  --btn-gold-hover-mid: #F8BC52;
+  --btn-gold-hover-bottom: #F5A623;
+
+  --btn-burgundy-top: #3A78C8;
+  --btn-burgundy-mid: #4A90E2;
+  --btn-burgundy-bottom: #2D5A9E;
+  --btn-burgundy-text: #D4E8FD;
+  --btn-burgundy-border: #1E3A6B;
+  --btn-burgundy-hover-top: #6BA8F0;
+  --btn-burgundy-hover-mid: #4A90E2;
+  --btn-burgundy-hover-bottom: #3A78C8;
+
+  --book-title-solid-color: #F5A623;
+  --book-title-solid-shadow: #A07520;
+  --book-divider-color: #4A90E2;
+}
+
+/* ==============================
+   THEME: Star Trek (LCARS / TNG)
+   ============================== */
+[data-theme="startrek"] {
+  --background: #0C0E1A;
+  --foreground: #D4CFC0;
+
+  /* Dark space tones */
+  --color-cream: #0C0E1A;
+  --color-cream-50: #141624;
+  --color-cream-100: #1C1E2E;
+  --color-cream-200: #262840;
+  --color-cream-300: #323452;
+  --color-cream-400: #3E4064;
+
+  /* Dusty blue (sciences/command) */
+  --color-burgundy: #6B8EAE;
+  --color-burgundy-50: #101820;
+  --color-burgundy-100: #1A2838;
+  --color-burgundy-200: #2E4460;
+  --color-burgundy-300: #486888;
+  --color-burgundy-400: #5A7C9E;
+  --color-burgundy-500: #6B8EAE;
+  --color-burgundy-600: #88A8C4;
+  --color-burgundy-700: #A4C0D6;
+  --color-burgundy-800: #C0D6E6;
+  --color-burgundy-900: #DCE8F0;
+
+  /* Mustard (operations/engineering) */
+  --color-gold: #CC9933;
+  --color-gold-50: #1A1508;
+  --color-gold-100: #332A10;
+  --color-gold-200: #665420;
+  --color-gold-300: #997E2A;
+  --color-gold-400: #CC9933;
+  --color-gold-500: #DDAA44;
+  --color-gold-600: #E6BB66;
+  --color-gold-700: #EECC88;
+  --color-gold-800: #F5DDAA;
+  --color-gold-900: #FBEECC;
+
+  /* Muted teal (for accents) */
+  --color-forest: #5A9E8F;
+  --color-forest-50: #0C1A16;
+  --color-forest-100: #18322C;
+  --color-forest-200: #2E5C50;
+  --color-forest-300: #448674;
+  --color-forest-400: #4E9282;
+  --color-forest-500: #5A9E8F;
+  --color-forest-600: #78B4A6;
+  --color-forest-700: #96CABC;
+  --color-forest-800: #B4DED2;
+  --color-forest-900: #D2F0E8;
+
+  --color-parchment: #1C1E2E;
+  --color-parchment-light: #262840;
+  --color-parchment-dark: #141624;
+
+  --font-display: var(--font-orbitron), system-ui, sans-serif;
+  --font-display-style: italic;
+  --font-body: system-ui, -apple-system, sans-serif;
+
+  /* White logo - flat, no gradient */
+  --gradient-gold-1: #FFFFFF;
+  --gradient-gold-2: #FFFFFF;
+  --gradient-gold-3: #FFFFFF;
+  --gradient-gold-4: #FFFFFF;
+  --gradient-gold-5: #FFFFFF;
+
+  /* Crimson header (command red) */
+  --leather-top: #6B2228;
+  --leather-mid: #8B2E36;
+  --leather-bottom: #4E181E;
+  --leather-border: #CC9933;
+
+  --parchment-1: #1C1E2E;
+  --parchment-2: #161828;
+  --parchment-3: #101222;
+  --parchment-opacity: 0.95;
+
+  /* Mustard buttons */
+  --btn-gold-top: #DDAA44;
+  --btn-gold-mid: #CC9933;
+  --btn-gold-bottom: #997E2A;
+  --btn-gold-text: #0C0E1A;
+  --btn-gold-border: #665420;
+  --btn-gold-hover-top: #E6BB66;
+  --btn-gold-hover-mid: #DDAA44;
+  --btn-gold-hover-bottom: #CC9933;
+
+  /* Dusty blue buttons */
+  --btn-burgundy-top: #5A7C9E;
+  --btn-burgundy-mid: #6B8EAE;
+  --btn-burgundy-bottom: #486888;
+  --btn-burgundy-text: #DCE8F0;
+  --btn-burgundy-border: #2E4460;
+  --btn-burgundy-hover-top: #88A8C4;
+  --btn-burgundy-hover-mid: #6B8EAE;
+  --btn-burgundy-hover-bottom: #5A7C9E;
+
+  --book-title-solid-color: #FFFFFF;
+  --book-title-solid-shadow: #6B8EAE;
+  --book-divider-color: #CC9933;
+}
+
+/* ==============================
+   THEME: Romance
+   ============================== */
+[data-theme="romance"] {
+  --background: #FFF5F7;
+  --foreground: #2D2D2D;
+
+  --color-cream: #FFF5F7;
+  --color-cream-50: #FFFBFC;
+  --color-cream-100: #FFF5F7;
+  --color-cream-200: #FFE4EA;
+  --color-cream-300: #FFD0DA;
+  --color-cream-400: #FFBCC9;
+
+  --color-burgundy: #DB2777;
+  --color-burgundy-50: #FFF1F5;
+  --color-burgundy-100: #FFE0EA;
+  --color-burgundy-200: #FFBDD5;
+  --color-burgundy-300: #FF8AB5;
+  --color-burgundy-400: #F4488E;
+  --color-burgundy-500: #DB2777;
+  --color-burgundy-600: #BE185D;
+  --color-burgundy-700: #9D174D;
+  --color-burgundy-800: #831843;
+  --color-burgundy-900: #500724;
+
+  --color-gold: #F59E0B;
+  --color-gold-50: #FFFBEB;
+  --color-gold-100: #FEF3C7;
+  --color-gold-200: #FDE68A;
+  --color-gold-300: #FCD34D;
+  --color-gold-400: #FBBF24;
+  --color-gold-500: #F59E0B;
+  --color-gold-600: #D97706;
+  --color-gold-700: #B45309;
+  --color-gold-800: #92400E;
+  --color-gold-900: #78350F;
+
+  --color-forest: #059669;
+  --color-forest-50: #ECFDF5;
+  --color-forest-100: #D1FAE5;
+  --color-forest-200: #A7F3D0;
+  --color-forest-300: #6EE7B7;
+  --color-forest-400: #34D399;
+  --color-forest-500: #10B981;
+  --color-forest-600: #059669;
+  --color-forest-700: #047857;
+  --color-forest-800: #065F46;
+  --color-forest-900: #064E3B;
+
+  --color-parchment: #FFE0EA;
+  --color-parchment-light: #FFF1F5;
+  --color-parchment-dark: #FFBDD5;
+
+  --font-display: var(--font-cinzel-decorative), serif;
+  --font-body: var(--font-lora), Georgia, Cambria, serif;
+
+  --gradient-gold-1: #F59E0B;
+  --gradient-gold-2: #FDE68A;
+  --gradient-gold-3: #F59E0B;
+  --gradient-gold-4: #B45309;
+  --gradient-gold-5: #F59E0B;
+
+  --leather-top: #BE185D;
+  --leather-mid: #DB2777;
+  --leather-bottom: #9D174D;
+  --leather-border: #F59E0B;
+
+  --parchment-1: #FFF1F5;
+  --parchment-2: #FFE0EA;
+  --parchment-3: #FFBDD5;
+
+  --btn-gold-top: #FCD34D;
+  --btn-gold-mid: #F59E0B;
+  --btn-gold-bottom: #D97706;
+  --btn-gold-text: #2D2D2D;
+  --btn-gold-border: #B45309;
+  --btn-gold-hover-top: #FDE68A;
+  --btn-gold-hover-mid: #FCD34D;
+  --btn-gold-hover-bottom: #F59E0B;
+
+  --btn-burgundy-top: #F4488E;
+  --btn-burgundy-mid: #DB2777;
+  --btn-burgundy-bottom: #BE185D;
+  --btn-burgundy-text: #FFF5F7;
+  --btn-burgundy-border: #9D174D;
+  --btn-burgundy-hover-top: #FF8AB5;
+  --btn-burgundy-hover-mid: #F4488E;
+  --btn-burgundy-hover-bottom: #DB2777;
+
+  --book-title-solid-color: #F59E0B;
+  --book-title-solid-shadow: #B45309;
+  --book-divider-color: #DB2777;
+}
+
+/* ==============================
+   THEME: Retro (Tron / 80s)
+   ============================== */
+[data-theme="retro"] {
+  --background: #000814;
+  --foreground: #E0E0E0;
+
+  --color-cream: #000814;
+  --color-cream-50: #0A1128;
+  --color-cream-100: #121C3C;
+  --color-cream-200: #1A2850;
+  --color-cream-300: #223464;
+  --color-cream-400: #2A4078;
+
+  --color-burgundy: #FF006E;
+  --color-burgundy-50: #1A000E;
+  --color-burgundy-100: #33001C;
+  --color-burgundy-200: #66003A;
+  --color-burgundy-300: #990057;
+  --color-burgundy-400: #CC0064;
+  --color-burgundy-500: #FF006E;
+  --color-burgundy-600: #FF3388;
+  --color-burgundy-700: #FF66A3;
+  --color-burgundy-800: #FF99BE;
+  --color-burgundy-900: #FFCCE0;
+
+  --color-gold: #FFD60A;
+  --color-gold-50: #1A1800;
+  --color-gold-100: #332F00;
+  --color-gold-200: #665E00;
+  --color-gold-300: #998D00;
+  --color-gold-400: #CCBB08;
+  --color-gold-500: #FFD60A;
+  --color-gold-600: #FFE03B;
+  --color-gold-700: #FFE96C;
+  --color-gold-800: #FFF29D;
+  --color-gold-900: #FFFBCE;
+
+  --color-forest: #00F5D4;
+  --color-forest-50: #001A15;
+  --color-forest-100: #00332A;
+  --color-forest-200: #006654;
+  --color-forest-300: #00997E;
+  --color-forest-400: #00CCA9;
+  --color-forest-500: #00F5D4;
+  --color-forest-600: #33F7DD;
+  --color-forest-700: #66FAE6;
+  --color-forest-800: #99FCEF;
+  --color-forest-900: #CCFEF7;
+
+  --color-parchment: #0A1128;
+  --color-parchment-light: #121C3C;
+  --color-parchment-dark: #000814;
+
+  --font-display: var(--font-vt323), "VT323", ui-monospace, monospace;
+  --font-body: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  --gradient-gold-1: #FFD60A;
+  --gradient-gold-2: #FFD60A;
+  --gradient-gold-3: #FFD60A;
+  --gradient-gold-4: #FFD60A;
+  --gradient-gold-5: #FFD60A;
+
+  --leather-top: #1A000E;
+  --leather-mid: #33001C;
+  --leather-bottom: #0A0004;
+  --leather-border: #FF006E;
+
+  --parchment-1: #0A1128;
+  --parchment-2: #060A1A;
+  --parchment-3: #000814;
+
+  --btn-gold-top: #FFE03B;
+  --btn-gold-mid: #FFD60A;
+  --btn-gold-bottom: #CCBB08;
+  --btn-gold-text: #000814;
+  --btn-gold-border: #998D00;
+  --btn-gold-hover-top: #FFE96C;
+  --btn-gold-hover-mid: #FFE03B;
+  --btn-gold-hover-bottom: #FFD60A;
+
+  --btn-burgundy-top: #FF3388;
+  --btn-burgundy-mid: #FF006E;
+  --btn-burgundy-bottom: #CC0064;
+  --btn-burgundy-text: #FFCCE0;
+  --btn-burgundy-border: #66003A;
+  --btn-burgundy-hover-top: #FF66A3;
+  --btn-burgundy-hover-mid: #FF3388;
+  --btn-burgundy-hover-bottom: #FF006E;
+
+  --book-title-solid-color: #FFD60A;
+  --book-title-solid-shadow: #998D00;
+  --book-divider-color: #FF006E;
+}
+
+/* ==============================
+   THEME: Mystery (Clue / murder mystery)
+   ============================== */
+[data-theme="mystery"] {
+  --background: #1C1410;
+  --foreground: #D4C8B8;
+
+  --color-cream: #1C1410;
+  --color-cream-50: #251C16;
+  --color-cream-100: #2E241C;
+  --color-cream-200: #3E3228;
+  --color-cream-300: #4E4234;
+  --color-cream-400: #5E5240;
+
+  --color-burgundy: #8B1E1E;
+  --color-burgundy-50: #1E0E0E;
+  --color-burgundy-100: #2E1616;
+  --color-burgundy-200: #4A2424;
+  --color-burgundy-300: #6B3232;
+  --color-burgundy-400: #8B1E1E;
+  --color-burgundy-500: #A03030;
+  --color-burgundy-600: #C04848;
+  --color-burgundy-700: #D87070;
+  --color-burgundy-800: #E89898;
+  --color-burgundy-900: #F5C0C0;
+
+  --color-gold: #B8860B;
+  --color-gold-50: #1A1408;
+  --color-gold-100: #2E2410;
+  --color-gold-200: #5C481A;
+  --color-gold-300: #8A6C24;
+  --color-gold-400: #B8860B;
+  --color-gold-500: #CCA020;
+  --color-gold-600: #DDB840;
+  --color-gold-700: #E8CC70;
+  --color-gold-800: #F2E0A0;
+  --color-gold-900: #FBF4D0;
+
+  --color-forest: #6B8E60;
+  --color-forest-50: #0E140C;
+  --color-forest-100: #1C2818;
+  --color-forest-200: #344830;
+  --color-forest-300: #4C6848;
+  --color-forest-400: #5C7E54;
+  --color-forest-500: #6B8E60;
+  --color-forest-600: #88AA7E;
+  --color-forest-700: #A4C09C;
+  --color-forest-800: #C0D6BA;
+  --color-forest-900: #DCEAD8;
+
+  --color-parchment: #2E241C;
+  --color-parchment-light: #3E3228;
+  --color-parchment-dark: #1C1410;
+
+  --font-display: var(--font-cinzel-decorative), serif;
+  --font-body: var(--font-lora), Georgia, Cambria, serif;
+
+  --gradient-gold-1: #B8860B;
+  --gradient-gold-2: #E8CC70;
+  --gradient-gold-3: #B8860B;
+  --gradient-gold-4: #5C481A;
+  --gradient-gold-5: #B8860B;
+
+  --leather-top: #2E1616;
+  --leather-mid: #3A1C1C;
+  --leather-bottom: #1E0E0E;
+  --leather-border: #B8860B;
+
+  --parchment-1: #2E241C;
+  --parchment-2: #251C16;
+  --parchment-3: #1C1410;
+
+  --btn-gold-top: #DDB840;
+  --btn-gold-mid: #B8860B;
+  --btn-gold-bottom: #8A6C24;
+  --btn-gold-text: #1C1410;
+  --btn-gold-border: #5C481A;
+  --btn-gold-hover-top: #E8CC70;
+  --btn-gold-hover-mid: #DDB840;
+  --btn-gold-hover-bottom: #B8860B;
+
+  --btn-burgundy-top: #A03030;
+  --btn-burgundy-mid: #8B1E1E;
+  --btn-burgundy-bottom: #6B3232;
+  --btn-burgundy-text: #F5C0C0;
+  --btn-burgundy-border: #2E1616;
+  --btn-burgundy-hover-top: #C04848;
+  --btn-burgundy-hover-mid: #A03030;
+  --btn-burgundy-hover-bottom: #8B1E1E;
+
+  --book-title-solid-color: #B8860B;
+  --book-title-solid-shadow: #5C481A;
+  --book-divider-color: #B8860B;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
+  font-family: var(--font-body);
 }
 
 @layer utilities {
@@ -20,15 +773,16 @@ body {
 
 /* Fantasy book title styling */
 .book-title {
-  font-family: var(--font-cinzel-decorative), serif;
+  font-family: var(--font-display);
+  font-style: var(--font-display-style);
   font-weight: 700;
   background: linear-gradient(
     180deg,
-    #C9A227 0%,
-    #F7ECBF 25%,
-    #C9A227 50%,
-    #876A1A 75%,
-    #C9A227 100%
+    var(--gradient-gold-1) 0%,
+    var(--gradient-gold-2) 25%,
+    var(--gradient-gold-3) 50%,
+    var(--gradient-gold-4) 75%,
+    var(--gradient-gold-5) 100%
   );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -40,11 +794,12 @@ body {
 
 /* Alternative solid gold for smaller sizes */
 .book-title-solid {
-  font-family: var(--font-cinzel-decorative), serif;
+  font-family: var(--font-display);
+  font-style: var(--font-display-style);
   font-weight: 700;
-  color: #C9A227;
+  color: var(--book-title-solid-color);
   text-shadow:
-    1px 1px 0 #876A1A,
+    1px 1px 0 var(--book-title-solid-shadow),
     2px 2px 4px rgba(0, 0, 0, 0.3);
   letter-spacing: 0.05em;
 }
@@ -64,8 +819,8 @@ body {
   background: linear-gradient(
     90deg,
     transparent,
-    #C9A227 20%,
-    #C9A227 80%,
+    var(--book-divider-color) 20%,
+    var(--book-divider-color) 80%,
     transparent
   );
 }
@@ -74,41 +829,45 @@ body {
 .parchment-card {
   background: linear-gradient(
     145deg,
-    #FAF3E7 0%,
-    #F4E4C9 50%,
-    #E6D5B8 100%
+    var(--parchment-1) 0%,
+    var(--parchment-2) 50%,
+    var(--parchment-3) 100%
   );
-  border: 1px solid #E6D5B8;
+  border: 1px solid var(--parchment-3);
   box-shadow:
     0 2px 4px rgba(0, 0, 0, 0.1),
     inset 0 0 40px rgba(139, 90, 43, 0.05);
+  position: relative;
+  z-index: 1;
 }
 
 /* Leather-style header */
 .leather-header {
   background: linear-gradient(
     180deg,
-    #5C262C 0%,
-    #722F37 50%,
-    #461D22 100%
+    var(--leather-top) 0%,
+    var(--leather-mid) 50%,
+    var(--leather-bottom) 100%
   );
-  border-bottom: 3px solid #C9A227;
+  border-bottom: 3px solid var(--leather-border);
   box-shadow:
     0 4px 6px rgba(0, 0, 0, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  z-index: 1;
 }
 
 /* Gold button */
 .btn-gold {
   background: linear-gradient(
     180deg,
-    #DFC044 0%,
-    #C9A227 50%,
-    #A88520 100%
+    var(--btn-gold-top) 0%,
+    var(--btn-gold-mid) 50%,
+    var(--btn-gold-bottom) 100%
   );
-  color: #2D2D2D;
+  color: var(--btn-gold-text);
   font-weight: 600;
-  border: 1px solid #876A1A;
+  border: 1px solid var(--btn-gold-border);
   box-shadow:
     0 2px 4px rgba(0, 0, 0, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
@@ -118,9 +877,9 @@ body {
 .btn-gold:hover {
   background: linear-gradient(
     180deg,
-    #EDD87F 0%,
-    #DFC044 50%,
-    #C9A227 100%
+    var(--btn-gold-hover-top) 0%,
+    var(--btn-gold-hover-mid) 50%,
+    var(--btn-gold-hover-bottom) 100%
   );
   box-shadow:
     0 4px 8px rgba(0, 0, 0, 0.25),
@@ -131,13 +890,13 @@ body {
 .btn-burgundy {
   background: linear-gradient(
     180deg,
-    #8B3D46 0%,
-    #722F37 50%,
-    #5C262C 100%
+    var(--btn-burgundy-top) 0%,
+    var(--btn-burgundy-mid) 50%,
+    var(--btn-burgundy-bottom) 100%
   );
-  color: #FDF8F3;
+  color: var(--btn-burgundy-text);
   font-weight: 600;
-  border: 1px solid #461D22;
+  border: 1px solid var(--btn-burgundy-border);
   box-shadow:
     0 2px 4px rgba(0, 0, 0, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -147,11 +906,84 @@ body {
 .btn-burgundy:hover {
   background: linear-gradient(
     180deg,
-    #C06F78 0%,
-    #8B3D46 50%,
-    #722F37 100%
+    var(--btn-burgundy-hover-top) 0%,
+    var(--btn-burgundy-hover-mid) 50%,
+    var(--btn-burgundy-hover-bottom) 100%
   );
   box-shadow:
     0 4px 8px rgba(0, 0, 0, 0.25),
     inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
+
+/* ==============================
+   Dark Sci-Fi: starfield background
+   ============================== */
+.theme-stars {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.8), transparent),
+    radial-gradient(1px 1px at 25% 35%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1.5px 1.5px at 40% 8%, rgba(200,220,255,0.9), transparent),
+    radial-gradient(1px 1px at 55% 45%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 70% 20%, rgba(255,255,255,0.7), transparent),
+    radial-gradient(1.5px 1.5px at 85% 60%, rgba(200,210,255,0.8), transparent),
+    radial-gradient(1px 1px at 15% 70%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1px 1px at 35% 85%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1.5px 1.5px at 60% 75%, rgba(220,230,255,0.7), transparent),
+    radial-gradient(1px 1px at 80% 90%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 5% 50%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1px 1px at 92% 30%, rgba(255,255,255,0.7), transparent),
+    radial-gradient(1px 1px at 48% 55%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1.5px 1.5px at 20% 92%, rgba(200,220,255,0.6), transparent),
+    radial-gradient(1px 1px at 75% 48%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 33% 18%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1px 1px at 62% 32%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1.5px 1.5px at 88% 78%, rgba(210,220,255,0.7), transparent),
+    radial-gradient(1px 1px at 45% 95%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 8% 38%, rgba(255,255,255,0.4), transparent);
+}
+
+.theme-stars-twinkle {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  animation: twinkle 4s ease-in-out infinite alternate;
+  background:
+    radial-gradient(1px 1px at 18% 22%, rgba(255,255,255,0.7), transparent),
+    radial-gradient(1.5px 1.5px at 52% 12%, rgba(180,210,255,0.8), transparent),
+    radial-gradient(1px 1px at 78% 42%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 30% 62%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1.5px 1.5px at 65% 88%, rgba(200,220,255,0.7), transparent),
+    radial-gradient(1px 1px at 42% 38%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1px 1px at 90% 15%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1px 1px at 12% 82%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1.5px 1.5px at 72% 65%, rgba(210,230,255,0.6), transparent),
+    radial-gradient(1px 1px at 55% 28%, rgba(255,255,255,0.4), transparent);
+}
+
+@keyframes twinkle {
+  0% { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+
+/* ==============================
+   Star Trek: warp speed lines
+   ============================== */
+.theme-warp-vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 0%,
+    rgba(12,14,26,0.3) 30%,
+    rgba(12,14,26,0.7) 70%,
+    rgba(12,14,26,0.95) 100%
+  );
+}
+

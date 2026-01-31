@@ -28,7 +28,10 @@ export async function GET(
         }
       },
       questions: {
-        orderBy: { sortOrder: 'asc' }
+        orderBy: { sortOrder: 'asc' },
+        include: {
+          user: { select: { id: true, name: true } }
+        }
       }
     }
   })

@@ -4,9 +4,11 @@ import { useEffect, useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useSiteSettings } from '@/contexts/SiteSettingsContext'
 
 export default function LoginPage() {
   const router = useRouter()
+  const { siteName } = useSiteSettings()
   const [login, setLogin] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -50,7 +52,7 @@ export default function LoginPage() {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <h1 className="text-4xl sm:text-5xl font-bold text-burgundy-800" style={{ fontFamily: 'var(--font-cinzel-decorative), serif', letterSpacing: '0.05em' }}>
-            Maggie&apos;s<br />BookClub
+            {siteName}
           </h1>
           <p className="mt-4 text-burgundy-600 font-serif italic">
             {subtitle}

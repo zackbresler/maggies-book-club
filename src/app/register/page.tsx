@@ -3,9 +3,11 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useSiteSettings } from '@/contexts/SiteSettingsContext'
 
 export default function RegisterPage() {
   const router = useRouter()
+  const { siteName } = useSiteSettings()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -57,7 +59,7 @@ export default function RegisterPage() {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h1 className="text-center text-3xl font-bold text-gray-900">
-            Maggie&apos;s Book Club
+            {siteName}
           </h1>
           <h2 className="mt-6 text-center text-xl text-gray-600">
             Create your account

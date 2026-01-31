@@ -24,6 +24,8 @@ model User {
   vote         Vote?
   createdCodes InviteCode[] @relation("CreatedCodes")
   usedCode     InviteCode?  @relation("UsedCode")
+  questions    DiscussionQuestion[]
+  notes        BookNote[]
 }
 
 model Book {
@@ -46,6 +48,7 @@ model Book {
   ratings   Rating[]
   questions DiscussionQuestion[]
   votes     Vote[]
+  notes     BookNote[]
 }
 
 // Vote for next book - each user can only have one active vote
@@ -90,19 +93,37 @@ model InviteCode {
 model DiscussionQuestion {
   id        String   @id @default(cuid())
   bookId    String
+  userId    String?
   question  String
   sortOrder Int      @default(0)
   createdAt DateTime @default(now())
 
   // Relations
+  book Book  @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  user User? @relation(fields: [userId], references: [id])
+}
+
+model BookNote {
+  id        String   @id @default(cuid())
+  userId    String
+  bookId    String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, bookId])
 }
 
 model Announcement {
   id        String   @id @default(cuid())
   title     String   @default("Next Book Club Meeting")
   location  String
-  dateTime  DateTime
+  dateTime  String
+  timeZone  String   @default("America/Chicago")
   notes     String?
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())

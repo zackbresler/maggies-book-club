@@ -36,7 +36,7 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json()
-    const { title, location, dateTime, notes } = body
+    const { title, location, dateTime, timeZone, notes } = body
 
     if (!location || !dateTime) {
       return NextResponse.json(
@@ -56,7 +56,8 @@ export async function POST(request: Request) {
       data: {
         title: title || 'Next Book Club Meeting',
         location,
-        dateTime: new Date(dateTime),
+        dateTime,
+        timeZone: timeZone || Intl.DateTimeFormat().resolvedOptions().timeZone,
         notes: notes || null,
         isActive: true
       }

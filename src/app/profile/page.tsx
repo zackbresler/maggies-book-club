@@ -21,6 +21,9 @@ export default function ProfilePage() {
   const { data: session } = useSession()
   const [ratings, setRatings] = useState<UserRating[]>([])
   const [loading, setLoading] = useState(true)
+  const [newEmail, setNewEmail] = useState('')
+  const [emailMessage, setEmailMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const [changingEmail, setChangingEmail] = useState(false)
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -60,6 +63,64 @@ export default function ProfilePage() {
               Admin
             </span>
           )}
+        </div>
+
+        <div className="bg-white shadow rounded-lg p-6">
+          <h2 className="text-lg font-medium text-gray-900 mb-4">Change Email</h2>
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault()
+              setEmailMessage(null)
+              setChangingEmail(true)
+              try {
+                const res = await fetch('/api/profile/email', {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ email: newEmail }),
+                })
+                const data = await res.json()
+                if (res.ok) {
+                  setEmailMessage({ type: 'success', text: 'Email updated. Sign out and back in to see the change.' })
+                  setNewEmail('')
+                } else {
+                  setEmailMessage({ type: 'error', text: data.error })
+                }
+              } catch {
+                setEmailMessage({ type: 'error', text: 'Something went wrong' })
+              } finally {
+                setChangingEmail(false)
+              }
+            }}
+            className="space-y-4"
+          >
+            <div>
+              <label htmlFor="currentEmail" className="block text-sm font-medium text-gray-700">Current Email</label>
+              <p className="mt-1 text-sm text-gray-500">{session?.user?.email}</p>
+            </div>
+            <div>
+              <label htmlFor="newEmail" className="block text-sm font-medium text-gray-700">New Email</label>
+              <input
+                id="newEmail"
+                type="email"
+                required
+                value={newEmail}
+                onChange={(e) => setNewEmail(e.target.value)}
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              />
+            </div>
+            {emailMessage && (
+              <p className={`text-sm ${emailMessage.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
+                {emailMessage.text}
+              </p>
+            )}
+            <button
+              type="submit"
+              disabled={changingEmail || !newEmail.trim()}
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+            >
+              {changingEmail ? 'Updating...' : 'Update Email'}
+            </button>
+          </form>
         </div>
 
         <div className="bg-white shadow rounded-lg p-6">
