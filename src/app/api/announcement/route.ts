@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import crypto from 'crypto'
 
 // Get active announcement
 export async function GET() {
@@ -74,9 +75,10 @@ export async function POST(request: Request) {
       data: { isActive: false }
     })
 
-    // Create new announcement
+    // Create new announcement (provide ID explicitly to avoid cuid() issues on Alpine)
     const announcement = await prisma.announcement.create({
       data: {
+        id: crypto.randomUUID(),
         title: cleanTitle,
         location: cleanLocation,
         dateTime: cleanDateTime,

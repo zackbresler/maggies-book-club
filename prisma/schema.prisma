@@ -119,7 +119,7 @@ model BookNote {
 }
 
 model Announcement {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   title     String   @default("Next Book Club Meeting")
   location  String
   dateTime  String
