@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 
 function SpoilerSpan({ text }: { text: string }) {
   const [revealed, setRevealed] = useState(false)
@@ -63,6 +63,9 @@ export function DiscussionQuestions({
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editText, setEditText] = useState('')
   const [loading, setLoading] = useState(false)
+  const [isReordering, setIsReordering] = useState(false)
+  const [reorderedQuestions, setReorderedQuestions] = useState<Question[]>([])
+  const [savingReorder, setSavingReorder] = useState(false)
 
   const handleAddQuestion = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -132,20 +135,113 @@ export function DiscussionQuestions({
     return isAdmin || (currentUserId && q.userId === currentUserId)
   }
 
+  const startReordering = useCallback(() => {
+    setReorderedQuestions([...questions])
+    setIsReordering(true)
+  }, [questions])
+
+  const cancelReordering = useCallback(() => {
+    setIsReordering(false)
+    setReorderedQuestions([])
+  }, [])
+
+  const moveQuestion = useCallback((index: number, direction: 'up' | 'down') => {
+    setReorderedQuestions(prev => {
+      const newOrder = [...prev]
+      const targetIndex = direction === 'up' ? index - 1 : index + 1
+      if (targetIndex < 0 || targetIndex >= newOrder.length) return prev
+      ;[newOrder[index], newOrder[targetIndex]] = [newOrder[targetIndex], newOrder[index]]
+      return newOrder
+    })
+  }, [])
+
+  const saveReorder = async () => {
+    setSavingReorder(true)
+    try {
+      const response = await fetch(`/api/books/${bookId}/questions/reorder`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ questionIds: reorderedQuestions.map(q => q.id) })
+      })
+
+      if (response.ok) {
+        setIsReordering(false)
+        setReorderedQuestions([])
+        onUpdate()
+      }
+    } finally {
+      setSavingReorder(false)
+    }
+  }
+
+  const displayQuestions = isReordering ? reorderedQuestions : questions
+
   return (
     <div className="bg-white shadow rounded-lg p-6">
-      <h2 className="text-lg font-medium text-gray-900 mb-4">Discussion Questions</h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-medium text-gray-900">Discussion Questions</h2>
+        {isAdmin && questions.length > 1 && !isReordering && (
+          <button
+            onClick={startReordering}
+            className="text-sm text-indigo-600 hover:text-indigo-800"
+          >
+            Reorder
+          </button>
+        )}
+        {isReordering && (
+          <div className="flex gap-2">
+            <button
+              onClick={saveReorder}
+              disabled={savingReorder}
+              className="px-3 py-1 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700 disabled:opacity-50"
+            >
+              {savingReorder ? 'Saving...' : 'Save Order'}
+            </button>
+            <button
+              onClick={cancelReordering}
+              disabled={savingReorder}
+              className="px-3 py-1 border border-gray-300 text-gray-700 text-sm rounded hover:bg-gray-50 disabled:opacity-50"
+            >
+              Cancel
+            </button>
+          </div>
+        )}
+      </div>
 
-      {questions.length === 0 ? (
+      {displayQuestions.length === 0 ? (
         <p className="text-gray-500 text-sm">No discussion questions yet.</p>
       ) : (
         <ol className="space-y-3 mb-4">
-          {questions.map((q, index) => (
+          {displayQuestions.map((q, index) => (
             <li key={q.id} className="flex items-start gap-3">
+              {isReordering && (
+                <div className="flex-shrink-0 flex flex-col gap-0.5">
+                  <button
+                    onClick={() => moveQuestion(index, 'up')}
+                    disabled={index === 0 || savingReorder}
+                    className="w-6 h-5 flex items-center justify-center text-gray-400 hover:text-indigo-600 disabled:opacity-30 disabled:cursor-not-allowed"
+                    title="Move up"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={() => moveQuestion(index, 'down')}
+                    disabled={index === displayQuestions.length - 1 || savingReorder}
+                    className="w-6 h-5 flex items-center justify-center text-gray-400 hover:text-indigo-600 disabled:opacity-30 disabled:cursor-not-allowed"
+                    title="Move down"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                </div>
+              )}
               <span className="flex-shrink-0 w-6 h-6 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center text-sm font-medium">
                 {index + 1}
               </span>
-              {editingId === q.id ? (
+              {editingId === q.id && !isReordering ? (
                 <div className="flex-1 flex gap-2">
                   <input
                     type="text"
@@ -176,7 +272,7 @@ export function DiscussionQuestions({
                       <QuestionText text={q.question} />
                     )}
                   </p>
-                  {canModify(q) && (
+                  {canModify(q) && !isReordering && (
                     <div className="flex-shrink-0 flex gap-1">
                       <button
                         onClick={() => startEditing(q)}
